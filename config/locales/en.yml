@@ -49,7 +49,7 @@ en:
       query_placeholder: Enter a class, e.g. Fish
       tagline: your ontology repository for your semantic repository
       title: Welcome to the %{organization} 
-      welcome: Welcome to %{site},
+      welcome: Welcome to DEMO %{site},
     help:
       welcome: Welcome to the National Center for Biomedical Ontology’s %{site}. %{site} is a web-based application for accessing and sharing biomedical ontologies.
       getting_started: >
