@@ -46,8 +46,8 @@ en:
   home:
     index:
       find_ontology_placeholder: Start typing ontology name, then choose from list
-      query_placeholder: Enter a class, e.g. Melanoma
-      tagline: your ontology repository for your ontologies
+      query_placeholder: Enter a class, e.g. Fish
+      tagline: your ontology repository for your semantic repository
       title: Welcome to the %{organization} 
       welcome: Welcome to %{site},
     help:
