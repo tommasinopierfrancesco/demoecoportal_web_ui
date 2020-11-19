@@ -1,0 +1,2 @@
+class VirtualApplianceUser < ApplicationRecord
+end

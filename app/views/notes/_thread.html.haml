@@ -1,0 +1,25 @@
+%div.note
+
+  %div
+    = @note_decorator.title
+    = @note_decorator.status
+
+  %div
+    submitted by
+    = @note_decorator.author
+    = @note_decorator.created_date
+
+  = @note_decorator.body_content
+  = @note_decorator.proposal_content
+
+  %div.reply
+    %div.reply_meta
+      - if session[:user].nil?
+        = link_to "reply", login_index_path
+      - else
+        = @note_decorator.reply_link
+
+    - if @note.reply && !@note.reply.empty?
+      %div.discussion
+        %div.discussion_container
+          = recurse_replies(@note.reply).html_safe
