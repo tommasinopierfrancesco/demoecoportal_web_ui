@@ -4,9 +4,7 @@ Rails.application.routes.draw do
 
   resources :notes, constraints: { id: /.+/ }
 
-  resources :ontolobridge do
-    post :save_new_term_instructions, on: :collection
-  end
+  resources :ontolobridge
 
   resources :projects, constraints: { id: /[^\/]+/ }
 
@@ -107,6 +105,16 @@ Rails.application.routes.draw do
   get '/login_as/:login_as' => 'login#login_as'
   post '/login/send_pass', to: 'login#send_pass'
 
+  # Resource Index
+  get '/res_details/:id' => 'resources#details', :as => :obr_details
+  get '/resources/:ontology/:id' => 'resources#show', :as => :obr
+  get '/respage/' => 'resources#page', :as => :obrpage
+  get '/resource_index/resources' => 'resource_index#index'
+  get '/resource_index/resources/:resource_id' => 'resource_index#index'
+  match '/resource_index/:action', to: 'resource_index#(?-mix:element_annotations|results_paginate|resources_table)', via: [:get, :post]
+  get '/resource_index/search_classes' => 'resource_index#search_classes'
+  resources :resource_index
+
   # History
   get '/tab/remove/:ontology' => 'history#remove', :as => :remove_tab
   get '/tab/update/:ontology/:concept' => 'history#update', :as => :update_tab
@@ -128,10 +136,6 @@ Rails.application.routes.draw do
   match '/admin/update_info' => 'admin#update_info', via: [:get]
   match '/admin/update_check_enabled' => 'admin#update_check_enabled', via: [:get]
 
-
-  # Ontolobridge
-  # post '/ontolobridge/:save_new_term_instructions' => 'ontolobridge#save_new_term_instructions'
-
   ###########################################################################################################
   # Install the default route as the lowest priority.
   get '/:controller(/:action(/:id))'
@@ -144,6 +148,8 @@ Rails.application.routes.draw do
 
   # Redirects from old URL locations
   get '/annotate' => 'redirect#index', :url => '/annotator'
+  get '/all_resources' => 'redirect#index', :url => '/resources'
+  get '/resources' => 'redirect#index', :url => '/resource_index'
   get '/visconcepts/:ontology/' => 'redirect#index', :url => '/visualize/'
   get '/ajax/terms/label' => 'redirect#index', :url => '/ajax/classes/label'
   get '/ajax/terms/definition' => 'redirect#index', :url => '/ajax/classes/definition'

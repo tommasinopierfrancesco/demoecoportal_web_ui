@@ -35,5 +35,4 @@
 //= require Chart.min
 //= require select2 
 //= require jquery.readyselector
-//= require trumbowyg
 

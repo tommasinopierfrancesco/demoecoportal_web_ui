@@ -252,7 +252,7 @@ module ApplicationHelper
       # ont.acronym instead of ont.ontology.acronym
       # ont.name instead of ont.ontology.name
       # ont.id instead of ont.ontology.id
-      # TODO: annotator passes in 'custom_ontologies' to the ontologies parameter.
+      # TODO: resource index and annotator pass in 'custom_ontologies' to the ontologies parameter.
       next if ( ont.acronym.nil? or ont.acronym.empty? )
       acronym = ont.acronym
       name = ont.name
@@ -361,11 +361,6 @@ module ApplicationHelper
       return true if sub_ont_acronym == ontology_acronym
     end
     return false
-  end
-
-  def ontolobridge_instructions_template(ontology)
-    ont_data = Ontology.find_by(acronym: ontology.acronym)
-    ont_data.nil? || ont_data.new_term_instructions.empty? ? t('concepts.request_term.new_term_instructions') : ont_data.new_term_instructions
   end
 
   # http://stackoverflow.com/questions/1293573/rails-smart-text-truncation

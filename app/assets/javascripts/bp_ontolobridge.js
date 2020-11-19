@@ -12,116 +12,14 @@ function bindCancelRequestTermClick() {
   });
 }
 
-function bindNewTermInstructionsClick() {
-  jQuery("#new_term_instructions").live("click", function() {
-    jQuery(this).trumbowyg({
-      btns: [
-        ['viewHTML'],
-        ['undo', 'redo'], // Only supported in Blink browsers
-        ['formatting'],
-        ['strong', 'em', 'del'],
-        ['superscript', 'subscript'],
-        ['link'],
-        ['insertImage'],
-        ['justifyLeft', 'justifyCenter', 'justifyRight', 'justifyFull'],
-        ['unorderedList', 'orderedList'],
-        ['horizontalRule'],
-        ['removeformat'],
-        ['fullscreen']
-      ]
-    });
-    jQuery("#new_term_instructions_submit").show();
-    jQuery("#new_term_instructions_cancel").show();
-  });
-}
-
-function bindNewTermInstructionsSubmit() {
-  jQuery("#new_term_instructions_submit").live("click", function() {
-    saveNewTermInstructions();
-  });
-}
-
-function bindNewTermInstructionsCancel() {
-  jQuery("#new_term_instructions_cancel").live("click", function() {
-    var oldVal = jQuery("#new_term_instructions_old").val().trim();
-    var curVal = jQuery('#new_term_instructions').html().trim();
-
-    if (oldVal != curVal) {
-      if (confirm('Are you sure you want to discard your changes?')) {
-        jQuery('#new_term_instructions').trumbowyg('destroy');
-        jQuery('#new_term_instructions').html(oldVal);
-        hideButtons();
-      }
-    } else {
-      jQuery('#new_term_instructions').trumbowyg('destroy');
-      hideButtons();
-    }
-  });
-}
-
-function preventNewTermInstructionsFormSubmit() {
-  jQuery("#new_term_instructions_form").submit(function(e) {
-    e.preventDefault(e);
-  });
-}
-
-function clearProgressMessage() {
-  jQuery("#progress_message").hide();
-  jQuery("#progress_message").html("");
-};
-
-function showProgressMessage() {
-  clearProgressMessage();
-  var msg = "Saving...";
-  jQuery("#progress_message").text(msg).html();
-  jQuery("#progress_message").show();
-}
-
-function saveNewTermInstructions() {
-  var params = jQuery('#new_term_instructions_form').serialize();
-  var newInstructions = jQuery('#new_term_instructions').html().trim();
-  params += '&new_term_instructions=' + newInstructions;
-  showProgressMessage();
-
-  jQuery.ajax({
-    type: "POST",
-    url: "/ontolobridge/save_new_term_instructions",
-    dataType: "json",
-    data: params,
-    success: function(data) {
-      var status = data[1];
-
-      if (status && status >= 400 || data[0]['error'].length) {
-        showStatusMessages('', data[0]['error']);
-      } else {
-        jQuery('#new_term_instructions').trumbowyg('destroy');
-        jQuery("#new_term_instructions_old").val(newInstructions);
-        showStatusMessages(data[0]["success"], '');
-        setTimeout(function() { clearStatusMessages(); }, 5000);
-      }
-    },
-    error: function(request, textStatus, errorThrown) {
-      showStatusMessages('', errorThrown);
-    },
-    complete: function(request, textStatus) {
-      clearProgressMessage();
-      hideButtons();
-    }
-  });
-}
-
-function hideButtons() {
-  jQuery("#new_term_instructions_submit").hide();
-  jQuery("#new_term_instructions_cancel").hide();
-}
-
 function bindRequestTermSaveClick() {
   var success = "";
   var error = "";
   var user = jQuery(document).data().bp.user;
+  var parent_id = jQuery(this).data("parent_id");
   var ontology_id = jQuery(document).data().bp.ont_viewer.ontology_id;
   var params = jQuery("#request_term_form").serialize();
-  params += "&ontology=" + ontology_id + "&email=" + user["email"]
+  params += "&superclass=" + parent_id + "&ontology=" + ontology_id + "&email=" + user["email"]
 
   if (user["firstName"] && user["lastName"]) {
     params += "&submitter=" + user["firstName"] + " " + user["lastName"];
@@ -136,7 +34,7 @@ function bindRequestTermSaveClick() {
       var status = data[1];
 
       if (status && status >= 400) {
-        showStatusMessages('', data[0]["error"]);
+        showStatusMessages(null, data[0]["error"]);
       } else {
         var msg = "<strong>A new term request has been submitted successfully:</strong><br/><br/>";
         var button = jQuery(".request_term_form_div .save");
@@ -145,6 +43,7 @@ function bindRequestTermSaveClick() {
         for (var i in data[0]) {
           msg += i + ": " + data[0][i] + "<br/>";
         }
+
         showStatusMessages(msg, error);
       }
     },
@@ -161,6 +60,7 @@ function removeRequestTermBox(button) {
 
 function addRequestTermBox(id, type, button) {
   clearStatusMessages();
+
   var formContainer = jQuery(button).parents(".notes_list_container").children(".request_term_form_div");
   requestTermFields(id, formContainer);
   formContainer.show();
@@ -185,19 +85,20 @@ function showStatusMessages(success, error) {
   }
 }
 
-function requestTermButtons() {
+function requestTermButtons(id) {
   var button_submit = jQuery("<button>")
-    .attr("class", "btn")
     .attr("type", "submit")
     .attr("onclick", "")
+    .data("parent_id", id)
     .addClass("save")
-    .css("margin-right", "5px")
+    .css("margin-right", "20px")
+    .css("padding", "2px 8px")
     .html("Submit");
   var button_cancel = jQuery("<button>")
-    .attr("class", "btn")
     .attr("type", "button")
     .attr("onclick", "")
     .addClass("cancel")
+    .css("padding", "2px 8px")
     .html("Cancel");
   return button_submit.add(button_cancel);
 }
@@ -229,6 +130,7 @@ function appendTextArea(id, placeholder, div, isRequired, invalidMessage) {
     txtArea.prop('required', true);
     txtArea.attr("class", "req");
   }
+
   div.append(txtArea);
   div.append("<br/>");
 }
@@ -259,6 +161,7 @@ function appendField(id, text, div, isRequired, invalidMessage) {
     ipt.prop('required', true);
     ipt.attr("class", "req");
   }
+
   div.append(ipt);
   div.append("<br/>");
 }
@@ -277,9 +180,8 @@ function requestTermFields(id, container) {
   appendTextArea("justification", "Enter justification for the term - the reason it should be added", requestTermForm, false, 'Please enter a justification. Justifications are notes provided by the submitter to justify the term; often this will not be necessary, since for most routine cases the label/description/position will be sufficient, but sometimes it may be necessary to justify why a new term is necessary.');
 
   requestTermForm.append(jQuery("<input>").attr("type", "checkbox").attr("name", "notification_request").attr("id", "notification_request").css("height", "15px")).append("&nbsp;&nbsp;");
-  requestTermForm.append(jQuery("<input>").attr("type", "hidden").attr("name", "superclass").attr("id", "superclass").attr("value", id));
   requestTermForm.append(jQuery("<label>").attr("for", "notification_request").attr("id", "notification_request").css("margin", "0 0 10px 0").append("Email submitter when there is a status change"));
-  requestTermForm.append(jQuery("<div>").addClass("proposal_buttons").append(requestTermButtons()));
+  requestTermForm.append(jQuery("<div>").addClass("proposal_buttons").append(requestTermButtons(id)));
 
   container.append(requestTermForm);
 
@@ -295,8 +197,5 @@ jQuery(document).ready(function() {
   bindAddRequestTermClick();
   bindCancelRequestTermClick();
 
-  preventNewTermInstructionsFormSubmit();
-  bindNewTermInstructionsSubmit();
-  bindNewTermInstructionsCancel();
-  bindNewTermInstructionsClick();
+
 });

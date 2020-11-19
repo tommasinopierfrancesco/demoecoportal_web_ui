@@ -19,7 +19,6 @@
  *= require jquery.tooltip
  *= require thickbox
  *= require select2
- *= require trumbowyg
  *
  */
 
@@ -34,6 +33,7 @@
 @import "notice";
 @import "ontologies";
 @import "recommender";
+@import "resource_index";
 @import "search";
 @import "submissions";
 @import "tree";

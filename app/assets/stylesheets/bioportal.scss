@@ -949,17 +949,17 @@ button.fg-button-menu, button.fg-button {
  * Top navigation bar
  ************************************/
 .btn-bp-login {
-  color: #C58612;
-  border-color: #C58612 !important;
+  color: #eee;
+  border-color: #eee !important;
 
   &:hover {
-    color: #234979;
-    background-color: #C58612;
+    color: #555;
+    background-color: #ccc;
   }
 }
 
 .navbar-custom {
-  background-color: #234979;
+  background-color: #5499a4;
 }
 
 .nav_text a {

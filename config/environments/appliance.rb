@@ -34,15 +34,15 @@ BioportalWebUi::Application.configure do
   # `config.assets.precompile` and `config.assets.version` have moved to config/initializers/assets.rb
 
   # Specifies the header that your server uses for sending files.
-  # config.action_dispatch.x_sendfile_header = 'X-Sendfile' # for Apache
-  config.action_dispatch.x_sendfile_header = 'X-Accel-Redirect' # for NGINX
+  config.action_dispatch.x_sendfile_header = 'X-Sendfile' # for Apache
+  #config.action_dispatch.x_sendfile_header = 'X-Accel-Redirect' # for NGINX
 
   # Force all access to the app over SSL, use Strict-Transport-Security, and use secure cookies.
   # config.force_ssl = true
 
   # Use the lowest log level to ensure availability of diagnostic information
   # when problems arise.
-  config.log_level = :debug
+  config.log_level = :warn
 
   # Prepend all log lines with the following tags.
   # config.log_tags = [ :subdomain, :uuid ]
@@ -62,7 +62,7 @@ BioportalWebUi::Application.configure do
 
   # Enable locale fallbacks for I18n (makes lookups for any locale fall back to
   # the I18n.default_locale when a translation cannot be found).
-  config.i18n.fallbacks = [I18n.default_locale]
+  config.i18n.fallbacks = true
 
   # Send deprecation notices to registered listeners.
   config.active_support.deprecation = :notify
@@ -79,18 +79,14 @@ BioportalWebUi::Application.configure do
 
   # memcache setup
   # https://github.com/mperham/dalli#usage-with-rails-3x-and-4x
-  config.cache_store = :dalli_store, nil, { :namespace => 'bioportal_web_ui', :expires_in => 1.day }
+  config.cache_store = :dalli_store, nil, { :namespace => 'opui', :expires_in => 1.day, :value_max_bytes => 5*1024*1024 }
 
   # Disable serving static files from the `/public` folder by default since
   # Apache or NGINX already handles this.
-  config.public_file_server.enabled = ENV['RAILS_SERVE_STATIC_FILES'].present?
+  config.serve_static_files = ENV['RAILS_SERVE_STATIC_FILES'].present?
 
   # Add custom data attributes to sanitize allowed list
   config.action_view.sanitized_allowed_attributes = ['id', 'class', 'style', 'data-cls', 'data-ont']
 
-  # TODO: Fix this?
-  # enable json logging format.  Useful for logstash
-  # require 'rackstash'
-  # config.rackstash.enabled = true
-  # config.rackstash.tags = ['ruby', 'rails2']
+  NEW_RELIC_AGENT_ENABLED=false
 end
